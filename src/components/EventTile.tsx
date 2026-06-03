@@ -1,50 +1,131 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import type { ClubEvent } from "@/types";
 import { categoryStyles, cx, formatEventDate } from "@/lib/utils";
 import { Countdown } from "@/components/Countdown";
 
 export function EventTile({ event, featured = false }: { event: ClubEvent; featured?: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <Link
-      href={`/events/${event.id}`}
+    <motion.div
+      layout
+      onClick={() => setExpanded(!expanded)}
       className={cx(
-        "group block border border-[var(--border)] bg-[var(--surface)] p-5 hover:-translate-y-1 hover:border-[var(--foreground)]",
-        featured && "grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:p-8",
+        "group block cursor-pointer border border-[var(--border)] bg-[var(--surface)] p-5 hover:border-[var(--foreground)] transition-colors duration-200",
+        featured && "md:p-8",
+        !expanded && "hover:-translate-y-1 transition-transform"
       )}
     >
-      <div>
-        <div className="mb-5 flex flex-wrap items-center gap-2 font-mono text-xs uppercase">
-          <span className={cx("border px-2 py-1", categoryStyles[event.category])}>{event.category}</span>
-          <span className="text-[var(--muted)]">{event.difficulty}</span>
+      <motion.div layout="position" className="w-full">
+        {/* Top bar with tags */}
+        <div className="mb-4 flex flex-wrap items-center gap-2 font-mono text-xs uppercase">
+          <span className={cx("border px-2 py-1", categoryStyles[event.category])}>
+            {event.category}
+          </span>
+          <span className="border border-[var(--border)] px-2 py-1 text-[var(--muted)]">
+            {event.format}
+          </span>
+          <span className="text-acid">{event.track}</span>
         </div>
-        <h3 className={cx("font-display font-black leading-none", featured ? "text-4xl md:text-6xl" : "text-2xl md:text-3xl")}>
+
+        {/* Title */}
+        <h3 className={cx(
+          "font-display font-black leading-none uppercase tracking-tight",
+          featured ? "text-4xl md:text-6xl" : "text-2xl md:text-3xl"
+        )}>
           {event.title}
         </h3>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--muted)]">{event.summary}</p>
-      </div>
-      <div className="mt-6 grid gap-3 border-t border-[var(--border)] pt-5 font-mono text-xs uppercase md:mt-0 md:border-l md:border-t-0 md:pl-6 md:pt-0">
-        <div className="flex justify-between gap-4">
-          <span className="text-[var(--muted)]">date</span>
-          <span>{formatEventDate(event.date)}</span>
+
+        {/* Date (Visible in Collapsed State) */}
+        <div className="mt-3 font-mono text-xs uppercase text-[var(--muted)]">
+          [ {formatEventDate(event.date)} ]
         </div>
-        <div className="flex justify-between gap-4">
-          <span className="text-[var(--muted)]">venue</span>
-          <span>{event.venue}</span>
+
+        {/* Topics Tags (Visible in Collapsed State) */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {event.topics.map((topic) => (
+            <span
+              key={topic}
+              className="border border-[var(--border)] bg-[var(--background)] px-2 py-1 font-mono text-[10px] uppercase text-[var(--muted)]"
+            >
+              {topic}
+            </span>
+          ))}
         </div>
-        <div className="flex justify-between gap-4">
-          <span className="text-[var(--muted)]">seats</span>
-          <span>
-            {event.seatsFilled}/{event.seatsTotal}
-          </span>
-        </div>
-        <div className="flex justify-between gap-4">
-          <span className="text-[var(--muted)]">starts in</span>
-          <Countdown target={event.date} />
-        </div>
-        <div className="mt-4 h-1 bg-[var(--border)]">
-          <div className="h-full bg-[var(--accent)]" style={{ width: `${(event.seatsFilled / event.seatsTotal) * 100}%` }} />
-        </div>
-      </div>
-    </Link>
+      </motion.div>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mt-6 border-t border-[var(--border)] pt-5">
+              {/* Description */}
+              <p className="max-w-3xl text-sm leading-6 text-[var(--foreground)]">
+                {event.description}
+              </p>
+
+              {/* Event Attributes (Venue, Mode, Duration, Starts-In) */}
+              <div className="mt-6 grid grid-cols-2 gap-4 border-y border-[var(--border)] py-4 font-mono text-xs uppercase sm:grid-cols-4">
+                <div>
+                  <span className="block text-[var(--muted)] text-[10px]">venue</span>
+                  <span className="mt-1 block font-bold text-[var(--foreground)]">{event.venue}</span>
+                </div>
+                <div>
+                  <span className="block text-[var(--muted)] text-[10px]">mode</span>
+                  <span className="mt-1 block font-bold text-acid">{event.mode}</span>
+                </div>
+                <div>
+                  <span className="block text-[var(--muted)] text-[10px]">duration</span>
+                  <span className="mt-1 block font-bold text-[var(--foreground)]">{event.duration}</span>
+                </div>
+                <div>
+                  <span className="block text-[var(--muted)] text-[10px]">starts in</span>
+                  <span className="mt-1 block font-bold text-[var(--foreground)]">
+                    <Countdown target={event.date} />
+                  </span>
+                </div>
+              </div>
+
+              {/* Timeline / Agenda */}
+              {event.timeline && event.timeline.length > 0 && (
+                <div className="mt-6">
+                  <p className="mb-4 font-mono text-xs uppercase text-acid">{"// AGENDA"}</p>
+                  <div className="grid gap-3">
+                    {event.timeline.map((item, i) => (
+                      <div key={i} className="flex gap-4 border-l border-[var(--border)] pl-4">
+                        <span className="font-mono text-xs uppercase text-[var(--muted)] w-12">{item.time}</span>
+                        <span className="text-sm">{item.item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CTA Link to Register */}
+              <div className="mt-8">
+                <Link
+                  href={`/register?event=${event.id}`}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent collapsing the card
+                  }}
+                  className="inline-block border border-acid bg-acid/10 px-5 py-3 font-mono text-xs font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
+                >
+                  &gt; Register / Join Queue
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

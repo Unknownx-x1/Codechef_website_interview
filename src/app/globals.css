@@ -89,7 +89,20 @@ textarea {
 
 .section-shell {
   width: min(1180px, calc(100vw - 32px));
-  margin-inline: auto;
+  margin-left: 24px;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .section-shell {
+    margin-left: 64px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-shell {
+    margin-left: 96px;
+  }
 }
 
 .link-underline {
@@ -145,5 +158,6 @@ textarea {
 @media (max-width: 768px) {
   .section-shell {
     width: min(100% - 24px, 1180px);
+    margin-inline: auto;
   }
 }

@@ -1,137 +1,170 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
 
 const navItems = [
-  { href: "/", label: "home" },
-  { href: "/#metrics", label: "metrics" },
-  { href: "/#leaderboard", label: "ranklist" },
-  { href: "/events", label: "events" },
-  { href: "/#club", label: "club" },
-  { href: "/#timeline", label: "timeline" },
-  { href: "/#contact", label: "contact" },
+  { href: "/", id: "01", label: "HOME" },
+  { href: "/events", id: "02", label: "EVENTS" },
+  { href: "/club", id: "03", label: "CLUB" },
+  { href: "/register", id: "04", label: "REGISTER" },
+  { href: "/contact", id: "05", label: "CONTACT" },
 ];
 
 export function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("/");
+  const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
+  const [exeState, setExeState] = useState<"idle" | "compiling" | "running" | "completed">("idle");
+  const [outputLines, setOutputLines] = useState<string[]>([]);
 
-  useEffect(() => {
-    const sections = ["metrics", "leaderboard", "events", "club", "timeline", "contact", "register"];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-        if (visible?.target.id) {
-          setActive(`/#${visible.target.id}`);
-        }
-      },
-      { rootMargin: "-20% 0px -65% 0px", threshold: [0.08, 0.2, 0.45] },
-    );
-
-    sections.forEach((id) => {
-      const node = document.getElementById(id);
-      if (node) {
-        observer.observe(node);
-      }
-    });
-
-    const handleTop = () => {
-      if (window.scrollY < 120) {
-        setActive("/");
-      }
-    };
-
-    window.addEventListener("scroll", handleTop, { passive: true });
-    handleTop();
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleTop);
-    };
-  }, []);
+  const runSequence = async () => {
+    setExeState("compiling");
+    setOutputLines(["> g++ nav.cpp -O3 -o nav"]);
+    await new Promise((r) => setTimeout(r, 400));
+    setOutputLines((prev) => [...prev, "> Compiling..."]);
+    await new Promise((r) => setTimeout(r, 600));
+    setOutputLines((prev) => [...prev, "> \u2713 Build successful."]);
+    
+    await new Promise((r) => setTimeout(r, 400));
+    setExeState("running");
+    setOutputLines((prev) => [...prev, "> ./nav"]);
+    
+    await new Promise((r) => setTimeout(r, 300));
+    setOutputLines((prev) => [...prev, "Loading HOME..."]);
+    await new Promise((r) => setTimeout(r, 150));
+    setOutputLines((prev) => [...prev, "Loading EVENTS..."]);
+    await new Promise((r) => setTimeout(r, 150));
+    setOutputLines((prev) => [...prev, "Loading CLUB..."]);
+    await new Promise((r) => setTimeout(r, 150));
+    setOutputLines((prev) => [...prev, "Loading REGISTER..."]);
+    await new Promise((r) => setTimeout(r, 150));
+    setOutputLines((prev) => [...prev, "Loading CONTACT..."]);
+    
+    await new Promise((r) => setTimeout(r, 400));
+    setExeState("completed");
+  };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/95 backdrop-blur-none">
-      <nav className="section-shell flex min-h-16 items-center justify-between gap-4 font-mono text-sm">
-        <Link href="/" className="link-underline text-base font-bold" aria-label="CodeChef VIT Chennai home">
-          CC_VITC
-        </Link>
-        <div className="hidden items-center gap-8 md:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={active === item.href ? "link-underline text-acid" : "link-underline text-[var(--muted)] hover:text-[var(--foreground)]"}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-        <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="border border-[var(--border)] px-3 py-2 text-xs uppercase text-[var(--muted)] hover:border-[var(--foreground)] hover:text-[var(--foreground)]"
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-          >
-            {theme === "dark" ? "LIGHT" : "DARK"}
-          </button>
-          <Link
-            href="/#register"
-            className="border border-acid bg-acid px-4 py-2 text-xs font-bold uppercase text-black hover:-translate-y-0.5"
-          >
-            Register<span className="animate-cursor">_</span>
-          </Link>
-        </div>
-        <button
-          type="button"
-          className="border border-[var(--border)] px-3 py-2 font-mono text-xs md:hidden"
-          onClick={() => setOpen((current) => !current)}
-          aria-label="Toggle navigation menu"
-          aria-expanded={open}
-        >
-          {open ? "CLOSE" : "MENU"}
-        </button>
-      </nav>
-      <AnimatePresence>
-        {open ? (
+    <nav className="fixed right-4 top-1/2 z-50 flex -translate-y-1/2 flex-col items-start gap-3 font-mono md:right-12 lg:right-24 pointer-events-none">
+      <AnimatePresence mode="wait">
+        {exeState !== "completed" ? (
           <motion.div
-            initial={{ y: -24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -24, opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            className="absolute left-0 right-0 top-16 border-b border-[var(--border)] bg-[var(--background)] md:hidden"
+            key="editor"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="terminal-panel pointer-events-auto flex w-[280px] md:w-[380px] flex-col border border-[var(--border)] bg-[var(--surface)] shadow-2xl"
           >
-            <div className="section-shell grid gap-1 py-4 font-mono">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="border border-[var(--border)] px-4 py-4 text-lg"
+            <div className="flex items-center justify-between border-b border-[var(--border)] bg-[#111111] px-3 py-2 text-[10px] text-[var(--muted)]">
+              <span>nav.cpp</span>
+              <span className="text-acid animate-pulse">C++20</span>
+            </div>
+            
+            <div className="p-4 text-xs md:text-sm leading-relaxed overflow-x-auto bg-[#0a0a0a]">
+              <pre className="font-mono">
+                <span className="text-[#ff7b72]">#include</span> <span className="text-[#a5d6ff]">&lt;vector&gt;</span>
+                <br />
+                <span className="text-[#ff7b72]">#include</span> <span className="text-[#a5d6ff]">&lt;string&gt;</span>
+                <br /><br />
+                <span className="text-[#ff7b72]">std::vector</span>&lt;<span className="text-[#ff7b72]">std::string</span>&gt; <span className="text-[#d2a8ff]">navigate</span>() {'{'}
+                <br />
+                {"    "}<span className="text-[#ff7b72]">return</span> {'{'}
+                <br />
+                {"        "}<span className="text-[#a5d6ff]">&quot;Home&quot;</span>,
+                <br />
+                {"        "}<span className="text-[#a5d6ff]">&quot;Events&quot;</span>,
+                <br />
+                {"        "}<span className="text-[#a5d6ff]">&quot;Club&quot;</span>,
+                <br />
+                {"        "}<span className="text-[#a5d6ff]">&quot;Register&quot;</span>,
+                <br />
+                {"        "}<span className="text-[#a5d6ff]">&quot;Contact&quot;</span>
+                <br />
+                {"    "};
+                <br />
+                {'}'}
+              </pre>
+            </div>
+            
+            <div className="border-t border-[var(--border)] bg-[#111111] p-3">
+              {exeState === "idle" ? (
+                <button
+                  onClick={runSequence}
+                  className="w-full border border-acid bg-acid/10 px-4 py-2 font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
                 >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="grid grid-cols-2 gap-1 pt-2">
-                <button type="button" onClick={toggleTheme} className="border border-[var(--border)] px-4 py-4 text-left uppercase">
-                  {theme === "dark" ? "LIGHT" : "DARK"}
+                  &gt; Compile & Run
                 </button>
-                <Link href="/#register" onClick={() => setOpen(false)} className="border border-acid bg-acid px-4 py-4 text-black">
-                  REGISTER_
-                </Link>
-              </div>
+              ) : (
+                <div className="h-[90px] overflow-y-auto text-[10px] font-mono text-[var(--muted)] flex flex-col gap-1">
+                  {outputLines.map((line, idx) => (
+                    <div key={idx} className={line.includes("\u2713") ? "text-acid" : ""}>{line}</div>
+                  ))}
+                  <span className="animate-cursor text-[var(--foreground)]">_</span>
+                </div>
+              )}
             </div>
           </motion.div>
-        ) : null}
+        ) : (
+          <motion.div
+            key="navigation"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col items-start gap-1 mix-blend-difference text-white w-[280px] md:w-[320px]"
+          >
+            <div className="mb-4 text-xs font-bold tracking-widest text-[var(--muted)] md:mb-6">
+              {"// SYSTEM_NAV"}
+            </div>
+            
+            <div className="mb-2 flex w-full justify-start gap-8 border-b border-[var(--muted)] pb-2 text-xs md:text-sm font-bold tracking-widest text-[var(--muted)]">
+              <span className="w-8">ID</span>
+              <span>MODULE</span>
+            </div>
+            
+            <div className="flex w-full flex-col">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+                
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`pointer-events-auto group relative flex w-full items-center gap-8 py-2 text-lg md:text-2xl lg:text-3xl font-black uppercase tracking-tighter transition-all duration-300 hover:text-acid hover:translate-x-2 ${
+                      isActive ? "text-white" : "text-white/40"
+                    }`}
+                  >
+                    <span className={`w-8 text-sm md:text-lg font-mono font-normal transition-opacity ${isActive ? "opacity-100" : "opacity-50 group-hover:opacity-100"}`}>
+                      {item.id}
+                    </span>
+                    <span className="relative">
+                      {item.label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-indicator"
+                          className="absolute -left-6 top-1/2 h-[60%] w-1 -translate-y-1/2 bg-acid"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+            
+            <div className="mt-6 pointer-events-auto md:mt-10">
+              <button
+                onClick={() => toggleTheme()}
+                className="text-[10px] md:text-xs uppercase tracking-widest text-white/40 hover:text-acid transition-colors"
+              >
+                [ THEME: {theme} ]
+              </button>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
-    </header>
+    </nav>
   );
 }

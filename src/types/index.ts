@@ -6,17 +6,19 @@ export interface ClubEvent {
   category: EventCategory;
   date: string;
   venue: string;
-  seatsFilled: number;
-  seatsTotal: number;
   summary: string;
   description: string;
-  difficulty: "Beginner" | "Intermediate" | "Advanced";
-  prize: string;
-  timeline: Array<{
+  prize?: string;
+  timeline?: Array<{
     time: string;
     item: string;
   }>;
   featured?: boolean;
+  track: string;
+  topics: string[];
+  format: string;
+  duration: string;
+  mode: "Online" | "Offline" | "Hybrid";
 }
 
 export interface RegistrationPayload {

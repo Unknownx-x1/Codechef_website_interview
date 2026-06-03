@@ -3,7 +3,9 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { CursorField } from "@/components/CursorField";
 import { Navbar } from "@/components/Navbar";
+import { SocialLinks } from "@/components/SocialLinks";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PreEntry } from "@/components/PreEntry";
 
 const space = Space_Grotesk({
   subsets: ["latin"],
@@ -31,10 +33,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body className={`${space.variable} ${inter.variable} ${mono.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <div className="noise" />
-          <CursorField />
-          <Navbar />
-          {children}
+          <PreEntry>
+            <div className="noise" />
+            <CursorField />
+            <Navbar />
+            <SocialLinks />
+            {children}
+          </PreEntry>
         </ThemeProvider>
       </body>
     </html>

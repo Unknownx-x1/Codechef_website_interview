@@ -1,9 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useTypewriter } from "@/hooks/useTypewriter";
-import { HeroStats } from "@/components/HeroStats";
 
 export function Hero() {
   const chapterLine = "Official CodeChef Chapter at VIT Chennai";
@@ -14,8 +13,8 @@ export function Hero() {
   const showDetails = shouldReduceMotion || subtitleComplete;
 
   return (
-    <section className="section-shell grid min-h-[calc(100vh-64px)] items-center gap-8 py-10 md:grid-cols-[minmax(0,0.6fr)_minmax(320px,0.4fr)] md:py-12">
-      <div>
+    <section className="w-full px-6 md:px-16 lg:px-24 flex min-h-[calc(100vh-64px)] flex-col justify-start items-start gap-8 pt-24 md:pt-32 pb-12 text-left">
+      <div className="w-full max-w-4xl">
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -23,17 +22,17 @@ export function Hero() {
         >
           EST. 2019 | VITC
         </motion.p>
-        <div className="font-display text-[clamp(4.25rem,11vw,10rem)] font-black uppercase">
-          {["Solve.", "Compete.", "Repeat."].map((word, index) => (
+        <div className="font-display text-[clamp(4rem,9vw,8rem)] font-black uppercase leading-[0.9] tracking-tight">
+          {["CODECHEF", "CLUB", "VITC."].map((word, index) => (
             <motion.div
               key={word}
-              className="headline-word"
+              className={`headline-word ${word === "CLUB" ? "text-acid" : ""}`}
               initial={{ opacity: 0, x: -28 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.12, duration: 0.45 }}
             >
               {word}
-              {word === "Repeat." ? <span className="ml-2 inline-block animate-cursor text-acid">_</span> : null}
+              {word === "VITC." ? <span className="ml-2 inline-block animate-cursor text-acid">_</span> : null}
             </motion.div>
           ))}
         </div>
@@ -60,7 +59,6 @@ export function Hero() {
           </Link>
         </div>
       </div>
-      <HeroStats />
     </section>
   );
 }

@@ -14,9 +14,9 @@ export default async function EventsPage() {
     <PageTransition>
       <section className="section-shell py-12 md:py-16">
         <SectionHeading
-          eyebrow="// events"
-          title="A newspaper-style board for contests, labs, and talks."
-          copy="Filter by track, search like a terminal, then jump into the event dossier for registration details."
+          eyebrow="// EVENT_INDEX"
+          title="Campus competitive programming archive."
+          copy="Filter by track, search like a terminal, then expand the event dossier for registration details."
         />
         <EventFilters events={events} />
       </section>

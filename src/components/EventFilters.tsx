@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { ClubEvent } from "@/types";
 import { EventTile } from "@/components/EventTile";
 
@@ -19,7 +20,8 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
   const filtered = useMemo(() => {
     return events.filter((event) => {
       const matchesCategory = active === "ALL" || event.category === active;
-      const matchesQuery = `${event.title} ${event.summary} ${event.venue}`.toLowerCase().includes(query.toLowerCase());
+      const searchTarget = `${event.title} ${event.summary} ${event.venue} ${event.track} ${event.topics.join(" ")}`.toLowerCase();
+      const matchesQuery = searchTarget.includes(query.toLowerCase());
       return matchesCategory && matchesQuery;
     });
   }, [active, events, query]);
@@ -45,8 +47,8 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
             );
           })}
         </div>
-        <label className="flex items-center gap-2 border border-[var(--border)] px-3 py-2 font-mono text-xs">
-          <span className="text-[var(--muted)]">&gt;</span>
+        <label className="flex items-center gap-2 border border-[var(--border)] px-3 py-2 font-mono text-xs focus-within:border-acid transition-colors">
+          <span className="text-acid">&gt;</span>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -56,20 +58,47 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
           />
         </label>
       </div>
-      {featured ? (
-        <div className="editorial-grid gap-4">
-          <div className="col-span-12">
-            <EventTile event={featured} featured />
-          </div>
-          {rest.map((event, index) => (
-            <div key={event.id} className={index % 3 === 0 ? "col-span-12 md:col-span-7" : "col-span-12 md:col-span-5"}>
-              <EventTile event={event} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="border border-[var(--border)] p-6 font-mono text-sm text-[var(--muted)]">No matching events found.</p>
-      )}
+      
+      <AnimatePresence mode="popLayout">
+        {filtered.length > 0 ? (
+          <motion.div layout className="flex flex-col gap-4">
+            {featured && (
+              <motion.div
+                layout
+                key={featured.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <EventTile event={featured} featured />
+              </motion.div>
+            )}
+            {rest.map((event) => (
+              <motion.div
+                layout
+                key={event.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <EventTile event={event} />
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.p
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="border border-[var(--border)] p-6 font-mono text-sm text-[var(--muted)]"
+          >
+            No matching events found.
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
