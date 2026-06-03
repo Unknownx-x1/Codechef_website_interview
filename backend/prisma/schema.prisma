@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Club {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  established String
+  events      Event[]
+}
+
+model Event {
+  id            String         @id @default(uuid())
+  title         String
+  category      String
+  date          DateTime
+  venue         String
+  summary       String
+  description   String
+  prize         String?
+  track         String
+  topics        Json           // Stored as JSON array
+  format        String
+  duration      String
+  mode          String
+  clubId        String?
+  club          Club?          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+}
+
+model Registration {
+  id                 String   @id @default(uuid())
+  eventId            String
+  event              Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name               String
+  email              String
+  registrationNumber String
+  department         String
+  year               String
+  teamName           String?
+  createdAt          DateTime @default(now())
+}

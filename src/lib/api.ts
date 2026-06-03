@@ -3,6 +3,12 @@ import type { ClubEvent, RegistrationPayload, RegistrationResponse } from "@/typ
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_BASE_URL) {
     throw new Error("External API is not configured.");
@@ -17,10 +23,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error || `API request failed: ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  const result = (await response.json()) as ApiResponse<T>;
+  return result.data;
 }
 
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 350));
