@@ -71,7 +71,7 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
         <Field label="event" error={errors.eventId?.message}>
           <select {...register("eventId")} className="w-full bg-transparent px-0 pb-2 pt-5 outline-none">
             {upcomingEvents.map((event) => (
-              <option key={event.id} value={event.id} className="bg-ink-950">
+              <option key={event.id} value={event.id} className="bg-[var(--surface)]">
                 {event.title}
               </option>
             ))}
@@ -96,19 +96,19 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="year" error={errors.year?.message}>
           <select {...register("year")} className="w-full bg-transparent px-0 pb-2 pt-5 outline-none">
-            <option value="" className="bg-ink-950">
+            <option value="" className="bg-[var(--surface)]">
               Select
             </option>
-            <option value="1" className="bg-ink-950">
+            <option value="1" className="bg-[var(--surface)]">
               First
             </option>
-            <option value="2" className="bg-ink-950">
+            <option value="2" className="bg-[var(--surface)]">
               Second
             </option>
-            <option value="3" className="bg-ink-950">
+            <option value="3" className="bg-[var(--surface)]">
               Third
             </option>
-            <option value="4" className="bg-ink-950">
+            <option value="4" className="bg-[var(--surface)]">
               Fourth
             </option>
           </select>
@@ -120,7 +120,7 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-2 border border-acid bg-acid px-5 py-3 font-mono text-xs font-bold uppercase text-black disabled:cursor-wait disabled:opacity-70"
+        className="mt-2 border border-acid bg-acid px-5 py-3 font-mono text-xs font-bold uppercase text-[var(--background)] disabled:cursor-wait disabled:opacity-70"
       >
         {isSubmitting ? "PROCESSING..." : "REGISTER_"}
       </button>

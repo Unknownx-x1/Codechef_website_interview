@@ -136,7 +136,7 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
                     className={cx(
                       "inline-block border px-5 py-3 font-mono text-xs font-bold uppercase transition-colors",
                       (event.recapLink || event.archiveLink)
-                        ? "border-acid bg-acid/10 text-acid hover:bg-acid hover:text-black cursor-pointer"
+                        ? "border-acid bg-acid/10 text-acid hover:bg-acid hover:text-[var(--background)] cursor-pointer"
                         : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] cursor-not-allowed"
                     )}
                   >
@@ -148,7 +148,7 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
                     onClick={(e) => {
                       e.stopPropagation(); // prevent collapsing the card
                     }}
-                    className="inline-block border border-acid bg-acid/10 px-5 py-3 font-mono text-xs font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
+                    className="inline-block border border-acid bg-acid/10 px-5 py-3 font-mono text-xs font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-[var(--background)]"
                   >
                     &gt; Register / Join Queue
                   </Link>

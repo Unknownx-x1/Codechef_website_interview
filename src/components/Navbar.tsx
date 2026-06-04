@@ -154,7 +154,7 @@ export function Navbar() {
                 {exeState === "idle" ? (
                   <button
                     onClick={runSequence}
-                    className="w-full border border-acid bg-acid/10 px-4 py-2 font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
+                    className="w-full border border-acid bg-acid/10 px-4 py-2 font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-[var(--background)]"
                   >
                     &gt; Compile & Run
                   </button>
@@ -175,7 +175,7 @@ export function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.95, x: 20 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-start gap-1 mix-blend-difference text-white w-[280px] md:w-[320px]"
+              className="flex flex-col items-start gap-1 text-[var(--foreground)] w-[280px] md:w-[320px]"
             >
               <div className="mb-4 text-xs font-bold tracking-widest text-[var(--muted)] md:mb-6">
                 {"// SYSTEM_NAV"}
@@ -195,7 +195,7 @@ export function Navbar() {
                       key={item.href}
                       href={item.href}
                       className={`pointer-events-auto group relative flex w-full items-center gap-8 py-2 text-lg md:text-2xl lg:text-3xl font-black uppercase tracking-tighter transition-all duration-300 hover:text-acid hover:translate-x-2 ${
-                        isActive ? "text-white" : "text-white/40"
+                        isActive ? "text-[var(--foreground)]" : "text-[var(--muted)]"
                       }`}
                     >
                       <span className={`w-8 text-sm md:text-lg font-mono font-normal transition-opacity ${isActive ? "opacity-100" : "opacity-50 group-hover:opacity-100"}`}>
@@ -219,7 +219,7 @@ export function Navbar() {
               <div className="mt-6 pointer-events-auto md:mt-10">
                 <button
                   onClick={() => toggleTheme()}
-                  className="text-[10px] md:text-xs uppercase tracking-widest text-white/40 hover:text-acid transition-colors"
+                  className="text-[10px] md:text-xs uppercase tracking-widest text-[var(--muted)] hover:text-acid transition-colors"
                 >
                   [ THEME: {theme} ]
                 </button>

@@ -51,7 +51,7 @@ export function Hero() {
           </motion.p>
         </div>
         <div className="mt-8 flex flex-wrap gap-3 font-mono text-xs uppercase">
-          <Link href="/events" className="border border-acid bg-acid px-5 py-3 font-bold text-black hover:-translate-y-1">
+          <Link href="/events" className="border border-acid bg-acid px-5 py-3 font-bold text-[var(--background)] hover:-translate-y-1">
             View upcoming events
           </Link>
           <Link href="#club" className="border border-[var(--border)] px-5 py-3 hover:-translate-y-1 hover:border-[var(--foreground)]">

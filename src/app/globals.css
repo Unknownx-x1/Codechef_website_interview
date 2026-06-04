@@ -10,6 +10,7 @@
   --border: #222222;
   --muted: #888888;
   --accent: #e8ff47;
+  --accent-rgb: 232, 255, 71;
   --cursor-x: 50vw;
   --cursor-y: 50vh;
   --grid-x: 0px;
@@ -24,6 +25,7 @@
   --border: #d8d8cf;
   --muted: #555550;
   --accent: #1a1a1a;
+  --accent-rgb: 26, 26, 26;
 }
 
 * {

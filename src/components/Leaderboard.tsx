@@ -20,7 +20,7 @@ export function Leaderboard() {
           {leaderboard.map((coder) => (
             <div
               key={coder.handle}
-              className="group grid grid-cols-[64px_1fr_96px_70px] border-b border-[var(--border)] px-4 py-4 font-mono text-sm last:border-b-0 hover:bg-acid hover:text-black md:grid-cols-[90px_1fr_140px_90px]"
+              className="group grid grid-cols-[64px_1fr_96px_70px] border-b border-[var(--border)] px-4 py-4 font-mono text-sm last:border-b-0 hover:bg-acid hover:text-[var(--background)] md:grid-cols-[90px_1fr_140px_90px]"
             >
               <span>#{coder.rank}</span>
               <span className="truncate">{coder.handle}</span>

@@ -78,12 +78,12 @@ export function CodeChefOS({ events }: { events: ClubEvent[] }) {
                   onClick={() => openModule(item.id)}
                   className={`group flex items-center justify-between border px-3 py-3 text-left font-mono text-xs uppercase transition ${
                     activeModule === item.id
-                      ? "border-acid bg-acid text-black"
+                      ? "border-acid bg-acid text-[var(--background)]"
                       : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--foreground)] hover:text-[var(--foreground)]"
                   }`}
                 >
                   <span>{item.label}</span>
-                  <span className={activeModule === item.id ? "text-black" : "text-acid"}>{index + 1}</span>
+                  <span className={activeModule === item.id ? "text-[var(--background)]" : "text-acid"}>{index + 1}</span>
                 </button>
               ))}
             </nav>
@@ -262,7 +262,7 @@ function ModuleWindow({
             <span>stars</span>
           </div>
           {leaderboard.map((coder) => (
-            <div key={coder.handle} className="grid grid-cols-[64px_1fr_96px_70px] border-b border-[var(--border)] px-4 py-4 font-mono text-sm last:border-b-0 hover:bg-acid hover:text-black md:grid-cols-[90px_1fr_140px_90px]">
+            <div key={coder.handle} className="grid grid-cols-[64px_1fr_96px_70px] border-b border-[var(--border)] px-4 py-4 font-mono text-sm last:border-b-0 hover:bg-acid hover:text-[var(--background)] md:grid-cols-[90px_1fr_140px_90px]">
               <span>#{coder.rank}</span>
               <span className="truncate">{coder.handle}</span>
               <span>{coder.rating}</span>

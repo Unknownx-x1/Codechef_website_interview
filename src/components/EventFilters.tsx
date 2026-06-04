@@ -50,7 +50,7 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
                 key={filter.value}
                 type="button"
                 onClick={() => setActive(filter.value)}
-                className={selected ? "border border-acid bg-acid px-3 py-2 text-black" : "border border-[var(--border)] px-3 py-2 hover:border-[var(--foreground)]"}
+                className={selected ? "border border-acid bg-acid px-3 py-2 text-[var(--background)]" : "border border-[var(--border)] px-3 py-2 hover:border-[var(--foreground)]"}
                 aria-pressed={selected}
               >
                 [{filter.label}]

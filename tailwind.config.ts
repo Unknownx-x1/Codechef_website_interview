@@ -13,7 +13,7 @@ const config: Config = {
           100: "#F0F0F0",
           500: "#888888",
         },
-        acid: "#E8FF47",
+        acid: "rgba(var(--accent-rgb), <alpha-value>)",
         paper: "#F5F5F0",
         warning: "#FF4747",
       },
