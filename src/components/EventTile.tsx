@@ -9,6 +9,7 @@ import { Countdown } from "@/components/Countdown";
 
 export function EventTile({ event, featured = false }: { event: ClubEvent; featured?: boolean }) {
   const [expanded, setExpanded] = useState(false);
+  const isPast = new Date(event.date) < new Date();
 
   return (
     <motion.div
@@ -17,7 +18,7 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
       className={cx(
         "group block cursor-pointer border border-[var(--border)] bg-[var(--surface)] p-5 hover:border-[var(--foreground)] transition-colors duration-200",
         featured && "md:p-8",
-        !expanded && "hover:-translate-y-1 transition-transform"
+        !expanded && !isPast && "hover:-translate-y-1 transition-transform"
       )}
     >
       <motion.div layout="position" className="w-full">
@@ -68,6 +69,15 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
             className="overflow-hidden"
           >
             <div className="mt-6 border-t border-[var(--border)] pt-5">
+              {event.image && (
+                <div className="relative mb-6 w-full overflow-hidden border border-[var(--border)] bg-black/10">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-auto object-contain transition-transform duration-500 hover:scale-[1.01]"
+                  />
+                </div>
+              )}
               {/* Description */}
               <p className="max-w-3xl text-sm leading-6 text-[var(--foreground)]">
                 {event.description}
@@ -88,9 +98,9 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
                   <span className="mt-1 block font-bold text-[var(--foreground)]">{event.duration}</span>
                 </div>
                 <div>
-                  <span className="block text-[var(--muted)] text-[10px]">starts in</span>
-                  <span className="mt-1 block font-bold text-[var(--foreground)]">
-                    <Countdown target={event.date} />
+                  <span className="block text-[var(--muted)] text-[10px]">{isPast ? "status" : "starts in"}</span>
+                  <span className={cx("mt-1 block font-bold uppercase", isPast ? "text-[var(--muted)]" : "text-[var(--foreground)]")}>
+                    {isPast ? "COMPLETED" : <Countdown target={event.date} />}
                   </span>
                 </div>
               </div>
@@ -110,17 +120,39 @@ export function EventTile({ event, featured = false }: { event: ClubEvent; featu
                 </div>
               )}
 
-              {/* CTA Link to Register */}
+              {/* CTA Link to Register / Action */}
               <div className="mt-8">
-                <Link
-                  href={`/register?event=${event.id}`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevent collapsing the card
-                  }}
-                  className="inline-block border border-acid bg-acid/10 px-5 py-3 font-mono text-xs font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
-                >
-                  &gt; Register / Join Queue
-                </Link>
+                {isPast ? (
+                  <a
+                    href={event.recapLink || event.archiveLink || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!(event.recapLink || event.archiveLink)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    className={cx(
+                      "inline-block border px-5 py-3 font-mono text-xs font-bold uppercase transition-colors",
+                      (event.recapLink || event.archiveLink)
+                        ? "border-acid bg-acid/10 text-acid hover:bg-acid hover:text-black cursor-pointer"
+                        : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] cursor-not-allowed"
+                    )}
+                  >
+                    &gt; View Recap
+                  </a>
+                ) : (
+                  <Link
+                    href={`/register?event=${event.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent collapsing the card
+                    }}
+                    className="inline-block border border-acid bg-acid/10 px-5 py-3 font-mono text-xs font-bold uppercase text-acid transition-colors hover:bg-acid hover:text-black"
+                  >
+                    &gt; Register / Join Queue
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

@@ -26,7 +26,18 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
     });
   }, [active, events, query]);
 
-  const [featured, ...rest] = filtered;
+  const { upcoming, past } = useMemo(() => {
+    const now = new Date();
+    const up = filtered
+      .filter((e) => new Date(e.date) >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const pt = filtered
+      .filter((e) => new Date(e.date) < now)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return { upcoming: up, past: pt };
+  }, [filtered]);
+
+  const [featuredUpcoming, ...restUpcoming] = upcoming;
 
   return (
     <div>
@@ -61,31 +72,88 @@ export function EventFilters({ events }: { events: ClubEvent[] }) {
       
       <AnimatePresence mode="popLayout">
         {filtered.length > 0 ? (
-          <motion.div layout className="flex flex-col gap-4">
-            {featured && (
-              <motion.div
-                layout
-                key={featured.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <EventTile event={featured} featured />
-              </motion.div>
-            )}
-            {rest.map((event) => (
-              <motion.div
-                layout
-                key={event.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <EventTile event={event} />
-              </motion.div>
-            ))}
+          <motion.div layout className="flex flex-col gap-10">
+            {/* Active Events Section */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4 border-b border-[var(--border)] pb-2 font-mono">
+                <span className="text-acid animate-pulse">&gt;</span>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--foreground)]">
+                  ACTIVE_EVENTS
+                </h3>
+                <span className="h-[1px] flex-1 bg-[var(--border)]"></span>
+                <span className="text-[10px] text-[var(--muted)]">
+                  ({upcoming.length} OPPORTUNITIES)
+                </span>
+              </div>
+              
+              {upcoming.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {featuredUpcoming && (
+                    <motion.div
+                      layout
+                      key={featuredUpcoming.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <EventTile event={featuredUpcoming} featured />
+                    </motion.div>
+                  )}
+                  {restUpcoming.map((event) => (
+                    <motion.div
+                      layout
+                      key={event.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <EventTile event={event} />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <p className="border border-[var(--border)] p-5 font-mono text-xs text-[var(--muted)] uppercase">
+                  NO ACTIVE OPPORTUNITIES CURRENTLY MATCH THE FILTER CRITERIA.
+                </p>
+              )}
+            </div>
+
+            {/* Archived Events Section */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4 border-b border-[var(--border)] pb-2 font-mono">
+                <span className="text-acid animate-pulse">&gt;</span>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--foreground)]">
+                  ARCHIVED_EVENTS
+                </h3>
+                <span className="h-[1px] flex-1 bg-[var(--border)]"></span>
+                <span className="text-[10px] text-[var(--muted)]">
+                  ({past.length} RECORDS)
+                </span>
+              </div>
+              
+              {past.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {past.map((event) => (
+                    <motion.div
+                      layout
+                      key={event.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <EventTile event={event} />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <p className="border border-[var(--border)] p-5 font-mono text-xs text-[var(--muted)] uppercase">
+                  NO HISTORICAL RECORDS CURRENTLY MATCH THE FILTER CRITERIA.
+                </p>
+              )}
+            </div>
           </motion.div>
         ) : (
           <motion.p

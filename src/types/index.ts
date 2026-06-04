@@ -19,6 +19,9 @@ export interface ClubEvent {
   format: string;
   duration: string;
   mode: "Online" | "Offline" | "Hybrid";
+  recapLink?: string;
+  archiveLink?: string;
+  image?: string;
 }
 
 export interface RegistrationPayload {

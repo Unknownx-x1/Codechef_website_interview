@@ -21,6 +21,12 @@ type FormValues = z.infer<typeof schema>;
 
 export function RegistrationForm({ events, selectedEventId }: { events: ClubEvent[]; selectedEventId?: string }) {
   const [confirmed, setConfirmed] = useState(false);
+
+  const now = new Date();
+  const upcomingEvents = events.filter((e) => new Date(e.date) >= now);
+  const selectedEvent = events.find((e) => e.id === selectedEventId);
+  const isSelectedPast = selectedEvent ? new Date(selectedEvent.date) < now : false;
+
   const {
     register,
     handleSubmit,
@@ -28,7 +34,7 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      eventId: selectedEventId ?? events[0]?.id,
+      eventId: isSelectedPast ? (upcomingEvents[0]?.id ?? "") : (selectedEventId ?? upcomingEvents[0]?.id ?? ""),
       year: "",
     },
   });
@@ -49,20 +55,28 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="terminal-panel grid gap-4 p-5" noValidate>
-      <div className="relative z-10 mb-2 flex items-center justify-between border-b border-[var(--border)] pb-3 font-mono text-xs uppercase">
-        <span>register/session</span>
-        <span className="text-acid">secure</span>
-      </div>
-      <Field label="event" error={errors.eventId?.message}>
-        <select {...register("eventId")} className="w-full bg-transparent px-0 pb-2 pt-5 outline-none">
-          {events.map((event) => (
-            <option key={event.id} value={event.id} className="bg-ink-950">
-              {event.title}
-            </option>
-          ))}
-        </select>
-      </Field>
+    <div className="w-full">
+      {isSelectedPast && selectedEvent && (
+        <div className="mb-4 border border-warning bg-warning/10 p-4 font-mono text-xs uppercase text-warning">
+          &gt; Warning: Registration closed. &quot;{selectedEvent.title}&quot; occurred on {new Date(selectedEvent.date).toLocaleDateString("en-IN")}.
+          <br />
+          &gt; Please select an active opportunity below.
+        </div>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="terminal-panel grid gap-4 p-5" noValidate>
+        <div className="relative z-10 mb-2 flex items-center justify-between border-b border-[var(--border)] pb-3 font-mono text-xs uppercase">
+          <span>register/session</span>
+          <span className="text-acid">secure</span>
+        </div>
+        <Field label="event" error={errors.eventId?.message}>
+          <select {...register("eventId")} className="w-full bg-transparent px-0 pb-2 pt-5 outline-none">
+            {upcomingEvents.map((event) => (
+              <option key={event.id} value={event.id} className="bg-ink-950">
+                {event.title}
+              </option>
+            ))}
+          </select>
+        </Field>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="name" error={errors.name?.message}>
           <input {...register("name")} className="w-full bg-transparent px-0 pb-2 pt-5 outline-none" />
@@ -110,7 +124,8 @@ export function RegistrationForm({ events, selectedEventId }: { events: ClubEven
       >
         {isSubmitting ? "PROCESSING..." : "REGISTER_"}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }
 

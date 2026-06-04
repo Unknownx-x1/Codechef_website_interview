@@ -33,7 +33,16 @@ export function CodeChefOS({ events }: { events: ClubEvent[] }) {
   const requestedModule = searchParams.get("module") as ModuleId | null;
   const activeModule = modules.some((item) => item.id === requestedModule) ? requestedModule! : "dashboard";
   const activeIndex = modules.findIndex((item) => item.id === activeModule);
-  const activeEvent = events[0];
+
+  const now = new Date();
+  const upcomingEvents = events
+    .filter((e) => new Date(e.date) >= now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const pastEvents = events
+    .filter((e) => new Date(e.date) < now)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const activeEvent = upcomingEvents[0];
   const terminalText = useTypewriter(terminalLines, 22, 1800, true);
 
   function openModule(id: ModuleId) {
@@ -101,7 +110,12 @@ export function CodeChefOS({ events }: { events: ClubEvent[] }) {
                   transition={{ duration: 0.22 }}
                   className="min-h-full"
                 >
-                  <ModuleWindow activeModule={activeModule} events={events} />
+                  <ModuleWindow
+                    activeModule={activeModule}
+                    events={events}
+                    upcomingEvents={upcomingEvents}
+                    pastEvents={pastEvents}
+                  />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -146,7 +160,17 @@ export function CodeChefOS({ events }: { events: ClubEvent[] }) {
   );
 }
 
-function ModuleWindow({ activeModule, events }: { activeModule: ModuleId; events: ClubEvent[] }) {
+function ModuleWindow({
+  activeModule,
+  events,
+  upcomingEvents,
+  pastEvents,
+}: {
+  activeModule: ModuleId;
+  events: ClubEvent[];
+  upcomingEvents: ClubEvent[];
+  pastEvents: ClubEvent[];
+}) {
   if (activeModule === "dashboard") {
     return (
       <div className="grid gap-5">
@@ -158,7 +182,7 @@ function ModuleWindow({ activeModule, events }: { activeModule: ModuleId; events
         </div>
         <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
           <Panel title="today.focus">
-            {events.slice(0, 3).map((event) => (
+            {upcomingEvents.slice(0, 3).map((event) => (
               <EventRow key={event.id} event={event} />
             ))}
           </Panel>
@@ -178,11 +202,28 @@ function ModuleWindow({ activeModule, events }: { activeModule: ModuleId; events
     return (
       <div className="grid gap-5">
         <WindowIntro eyebrow="// contest calendar" title="Events run like contest rooms." copy="Each session is built around pressure, feedback, editorials, and upsolving." />
-        <div className="grid gap-3">
-          {events.map((event) => (
-            <EventRow key={event.id} event={event} expanded />
-          ))}
-        </div>
+        
+        {upcomingEvents.length > 0 && (
+          <div>
+            <div className="mb-3 font-mono text-[11px] uppercase text-acid tracking-wider">{"// ACTIVE OPPORTUNITIES"}</div>
+            <div className="grid gap-3">
+              {upcomingEvents.map((event) => (
+                <EventRow key={event.id} event={event} expanded />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {pastEvents.length > 0 && (
+          <div className={upcomingEvents.length > 0 ? "mt-6" : ""}>
+            <div className="mb-3 font-mono text-[11px] uppercase text-[var(--muted)] tracking-wider">{"// HISTORICAL RECORDS"}</div>
+            <div className="grid gap-3">
+              {pastEvents.map((event) => (
+                <EventRow key={event.id} event={event} expanded />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -303,11 +344,14 @@ function MetricCell({ label, value }: { label: string; value: string }) {
 }
 
 function EventRow({ event, expanded = false }: { event: ClubEvent; expanded?: boolean }) {
+  const isPast = new Date(event.date) < new Date();
   return (
-    <div className="border border-[var(--border)] p-4 transition-colors hover:border-acid">
+    <div className={`border border-[var(--border)] p-4 transition-colors ${isPast ? "opacity-60 hover:border-[var(--muted)]" : "hover:border-acid"}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-[11px] uppercase text-acid">{event.track} / {event.format}</p>
+          <p className="font-mono text-[11px] uppercase text-acid">
+            {event.track} / {event.format} {isPast && <span className="text-[var(--muted)] ml-2">[COMPLETED]</span>}
+          </p>
           <h2 className="mt-2 font-display text-2xl font-black">{event.title}</h2>
         </div>
         <p className="font-mono text-xs uppercase text-[var(--muted)]">{formatDate(event.date)}</p>

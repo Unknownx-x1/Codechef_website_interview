@@ -32,6 +32,9 @@ model Event {
   clubId        String?
   club          Club?          @relation(fields: [clubId], references: [id], onDelete: Cascade)
   registrations Registration[]
+  recapLink     String?
+  archiveLink   String?
+  image         String?
 }
 
 model Registration {

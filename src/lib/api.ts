@@ -35,7 +35,11 @@ const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 350));
 
 export async function getEvents(): Promise<ClubEvent[]> {
   if (API_BASE_URL) {
-    return request<ClubEvent[]>("/events");
+    try {
+      return await request<ClubEvent[]>("/events");
+    } catch (error) {
+      console.warn("Failed to fetch events from API. Falling back to mock data.", error);
+    }
   }
 
   await mockDelay();
@@ -44,7 +48,11 @@ export async function getEvents(): Promise<ClubEvent[]> {
 
 export async function getEventById(id: string): Promise<ClubEvent | null> {
   if (API_BASE_URL) {
-    return request<ClubEvent>(`/events/${id}`);
+    try {
+      return await request<ClubEvent>(`/events/${id}`);
+    } catch (error) {
+      console.warn(`Failed to fetch event by id ${id} from API. Falling back to mock data.`, error);
+    }
   }
 
   await mockDelay();
@@ -53,10 +61,14 @@ export async function getEventById(id: string): Promise<ClubEvent | null> {
 
 export async function createRegistration(payload: RegistrationPayload): Promise<RegistrationResponse> {
   if (API_BASE_URL) {
-    return request<RegistrationResponse>("/registrations", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    try {
+      return await request<RegistrationResponse>("/registrations", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.warn("Failed to create registration via API. Falling back to mock data.", error);
+    }
   }
 
   await mockDelay();
