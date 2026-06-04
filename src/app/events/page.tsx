@@ -7,6 +7,8 @@ export const metadata = {
   title: "Events | CodeChef VIT Chennai",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function EventsPage() {
   const events = await getEvents();
 
