@@ -18,7 +18,7 @@ export default async function RegisterPage({
           <SectionHeading
             eyebrow="// registration"
             title="Reserve a seat before the leaderboard fills up."
-            copy="The mock registration endpoint is shaped for a FastAPI backend, so the frontend contract can survive a real service swap."
+            copy="Fill out the form below to secure your spot in our upcoming contests and events."
           />
           <RegistrationForm events={events} selectedEventId={event} />
         </section>
